@@ -2,6 +2,7 @@ import time
 import pandas as pd
 import numpy as np
 
+
 CITY_DATA = { 'chicago': 'chicago.csv',
               'new york city': 'new_york_city.csv',
               'washington': 'washington.csv' }
@@ -18,18 +19,21 @@ def get_filters():
     print('Hello! Let\'s explore some US bikeshare data!')
     # get user input for city (chicago, new york city, washington). HINT: Use a while loop to handle invalid inputs
     city = input('\nWhat city you want to explore? Chicago, New york City, Washington.\n')
+    city = city.lower()
     cities = ['chicago', 'new york city', 'washington']
-    while(city.lower() not in cities):
+    while(city not in cities):
         city = input('\nSorry! we do not have data in this city! What city you want to explore? Chicago, New york City, Washington.\n')
     # get user input for month (all, january, february, ... , june)
     month = input('\nWhat month you wanna see? select all if you are not sure!\n')
+    month = month.lower()
     months = ['january', 'february', 'march', 'april', 'may', 'june', 'all']
-    while(month.lower() not in months):
+    while(month not in months):
         month = input('\nSorry! we do not have data in {}! looking for another month?\n'.format(month))
     # get user input for day of week (all, monday, tuesday, ... sunday)
     day = input('\nWhat day you wanna see? select all if you are not sure!\n')
+    day = day.lower()
     days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thrusday', 'friday', 'saturday', 'all']
-    while(day.lower() not in days):
+    while(day not in days):
         day = input('\nThere is no day called {}? select all if you are not sure!\n'.format(day))
 
     print('-'*40)
@@ -131,21 +135,36 @@ def user_stats(df):
     start_time = time.time()
 
     # Display counts of user types
+
     user_types = df['User Type'].value_counts()
     print('\nCounts of user Types:\n', user_types)
 
-    # Display counts of gender
-    gincoun = df['Gender'].value_counts()
-    print('\nCounts of users gender:\n', gincoun)
 
+    # Display counts of gender
+    try:
+        gincoun = df['Gender'].value_counts()
+        print('\nCounts of users gender:\n', gincoun)
+    except:
+        print('\nNo data about Genders in this city')
     # Display earliest, most recent, and most common year of birth
-    earliest = int(df['Birth Year'].min())
-    recent = int(df['Birth Year'].max())
-    common = int(df['Birth Year'].mode())
-    print('\n The earliest birth year is {}, while the most recent is {}, and the most common is {}'.format(earliest, recent, common))
+    try:
+        earliest = int(df['Birth Year'].min())
+        recent = int(df['Birth Year'].max())
+        common = int(df['Birth Year'].mode())
+        print('\n The earliest birth year is {}, while the most recent is {}, and the most common is {}'.format(earliest, recent, common))
+    except:
+        print('\nNo data about Birthdays in this city')
 
     print("\nThis took %s seconds." % (time.time() - start_time))
     print('-'*40)
+
+def display_data(df):
+    view = input('\nWould you like to view 5 rows of individual trip data? Enter yes or no\n').lower()
+    start_loc = 0
+    while (view == 'yes'):
+        print(df.iloc[start_loc : start_loc + 5, 1:])
+        start_loc += 5
+        view = input("Do you wish to continue?: ").lower()
 
 
 def main():
@@ -157,7 +176,8 @@ def main():
         station_stats(df)
         trip_duration_stats(df)
         user_stats(df)
-        
+        display_data(df)
+
         restart = input('\nWould you like to restart? Enter yes or no.\n')
         if restart.lower() != 'yes':
             break
